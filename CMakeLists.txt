@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 2.4.4)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
-project(zlib C)
+cmake_policy(SET CMP0048 NEW)
 
-set(VERSION "1.2.11")
+project(zlib
+	LANGUAGES C
+	VERSION 1.2.11)
 
+option(BUILD_EXAMPLES OFF "Enable building example executables")
 option(ASM686 "Enable building i686 assembly implementation")
 option(AMD64 "Enable building amd64 assembly implementation")
 
@@ -230,20 +233,22 @@ endif()
 # Example binaries
 #============================================================================
 
-add_executable(example test/example.c)
-target_link_libraries(example zlib)
-add_test(example example)
+if(BUILD_EXAMPLES)
+	add_executable(example test/example.c)
+	target_link_libraries(example zlib)
+	add_test(example example)
 
-add_executable(minigzip test/minigzip.c)
-target_link_libraries(minigzip zlib)
+	add_executable(minigzip test/minigzip.c)
+	target_link_libraries(minigzip zlib)
 
-if(HAVE_OFF64_T)
-    add_executable(example64 test/example.c)
-    target_link_libraries(example64 zlib)
-    set_target_properties(example64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
-    add_test(example64 example64)
+	if(HAVE_OFF64_T)
+		add_executable(example64 test/example.c)
+		target_link_libraries(example64 zlib)
+		set_target_properties(example64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+		add_test(example64 example64)
 
-    add_executable(minigzip64 test/minigzip.c)
-    target_link_libraries(minigzip64 zlib)
-    set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+		add_executable(minigzip64 test/minigzip.c)
+		target_link_libraries(minigzip64 zlib)
+		set_target_properties(minigzip64 PROPERTIES COMPILE_FLAGS "-D_FILE_OFFSET_BITS=64")
+	endif()
 endif()
